@@ -32,6 +32,17 @@ class PipelineTests(unittest.TestCase):
         self.assertTrue(projection.projected_rate.between(0, 1).all())
         self.assertEqual(len(scores), 2)
 
+    def test_snapshot_date_anchors_maturity_despite_future_year(self):
+        raw = pd.DataFrame([
+            {"project_id": "P1", "final_closing_fy": 2023, "evaluation_fy": 2024,
+             "outcome": "Satisfactory", "wb_region": "A", "global_practice": "Health", "as_of_date": "25-Sep-2026"},
+            {"project_id": "P2", "final_closing_fy": 2027, "evaluation_fy": 2026,
+             "outcome": "Satisfactory", "wb_region": "A", "global_practice": "Health", "as_of_date": "25-Sep-2026"},
+        ])
+        data, quality = prepare(raw)
+        self.assertEqual(quality["cohort_cutoff"], 2023)
+        self.assertEqual(data.project_id.tolist(), ["P1"])
+
 
 if __name__ == "__main__":
     unittest.main()
