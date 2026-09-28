@@ -74,7 +74,7 @@ a{color:#126998}@media(max-width:720px){.cards,.controls,.grid{grid-template-col
 const dataset=JSON.parse(document.getElementById('data').textContent);
 const dim=document.getElementById('dimension'), group=document.getElementById('group');
 const pct=x=>(x*100).toFixed(1)+'%'; const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function groups(){let list=Object.keys(dataset.views[dim.value]).sort((a,b)=>a.localeCompare(b));group.innerHTML=list.map(x=>'<option>'+esc(x)+'</option>').join('');render()}
+function groups(){let list=Object.keys(dataset.views[dim.value]).sort((a,b)=>a.localeCompare(b));group.innerHTML=list.map(x=>'<option>'+esc(x)+'</option>').join('');if(dim.value==='Region'&&list.includes('Western and Central Africa'))group.value='Western and Central Africa';render()}
 function render(){const item=dataset.views[dim.value][group.value];if(!item)return;
 const rows=item.observed,latest=rows.at(-1),prev=rows.at(-2),f=item.projection;
 document.getElementById('year').textContent='FY'+latest.final_closing_fy;
