@@ -80,7 +80,8 @@ with right:
 with st.expander("Data quality, definitions, and limits", expanded=True):
     st.write(f"Source rows: {quality['source_rows']:,}; unique project IDs: {quality['unique_projects']:,}; "
              f"included rated projects: {quality['included_projects']:,}. Latest observed closing year: "
-             f"FY{quality['latest_closing_fy']}; cohorts after FY{quality['cohort_cutoff']} excluded "
+             f"FY{quality['latest_closing_fy']}; snapshot: {quality['snapshot_date']}; "
+             f"cohorts after FY{quality['cohort_cutoff']} excluded "
              "to reduce evaluation-lag bias.")
     st.write("Each project receives one equal weight. The source keeps its latest evaluation. "
              "Rates are conditional on projects evaluated by the snapshot date; missing ratings are excluded. "

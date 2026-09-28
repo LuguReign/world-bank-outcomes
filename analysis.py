@@ -27,14 +27,18 @@ def prepare(raw: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     if data.empty:
         raise ValueError("No rated projects with valid closing years")
     max_closing = int(data["final_closing_fy"].max())
-    cutoff = max_closing - MATURITY_LAG
+    snapshot = pd.to_datetime(data.get("as_of_date", pd.Series(dtype="string")), errors="coerce", dayfirst=True).max()
+    # Snapshot calendar year is safer than the maximum recorded closing FY:
+    # the source can contain future-dated or anomalous closing years.
+    reference_year = int(snapshot.year) if pd.notna(snapshot) else max_closing
+    cutoff = reference_year - MATURITY_LAG
     data = data.loc[data["final_closing_fy"] <= cutoff].copy()
     data["final_closing_fy"] = data["final_closing_fy"].astype(int)
     for col in ("wb_region", "global_practice"):
         data[col] = data[col].fillna("Unspecified").replace("", "Unspecified")
     return data, {"source_rows": n_source, "unique_projects": n_unique,
                   "included_projects": len(data), "latest_closing_fy": max_closing,
-                  "cohort_cutoff": cutoff}
+                  "cohort_cutoff": cutoff, "snapshot_date": str(snapshot.date()) if pd.notna(snapshot) else "unknown"}
 
 
 def aggregate(data: pd.DataFrame, group: str) -> pd.DataFrame:

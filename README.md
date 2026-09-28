@@ -1,6 +1,6 @@
 # World Bank project outcomes explorer
 
-An executive dashboard of historical **IEG development outcome ratings** for evaluated World Bank projects. It compares the percentage rated *moderately satisfactory or above* across closing-year cohorts by World Bank region or global practice, and provides a deliberately simple three-year extrapolation. This is a portfolio learning exercise, not an official World Bank dashboard.
+An executive dashboard of historical **IEG development outcome ratings** for evaluated World Bank projects. It compares the percentage rated *moderately satisfactory or above* across closing-year cohorts by World Bank region or global practice, and provides a deliberately simple three-year extrapolation. The [GitHub Pages dashboard](https://lugureign.github.io/world-bank-outcomes/) is generated from the same analysis as the Streamlit app. This is a portfolio learning exercise, not an official World Bank dashboard.
 
 ## Source and measure
 
@@ -51,11 +51,11 @@ An executive dashboard of historical **IEG development outcome ratings** for eva
    git push -u origin main
    ```
 
-   GitHub requires you to authenticate for the push. In the repository's **Actions** tab, run **Refresh official IEG snapshot** once. It fetches and commits the public source file, then repeats monthly. Ensure repository Actions have permission to write contents. Deploy `app.py` through Streamlit Community Cloud; select this repository and its `main` branch. The dashboard displays a missing-data notice until the first refresh succeeds. Verify that your chosen host permits public data hosting and that its refresh/redeploy behavior matches your needs.
+   GitHub requires you to authenticate for the push. In the repository's **Actions** tab, run **Refresh official IEG snapshot** once. It fetches and commits the public source file and `docs/index.html`, then repeats monthly. Ensure repository Actions have permission to write contents. Enable GitHub Pages from the `main` branch `/docs` folder in **Settings → Pages**. The Streamlit version can also run locally from `app.py`.
 
 ## Analysis design
 
-`fetch.py` downloads API pages of 1,000, verifies the source columns, and atomically saves a snapshot. `analysis.py` validates ratings, removes duplicates, drops missing/unrecognized ratings and invalid years, then excludes the latest three closing-year cohorts to reduce the evaluation lag. Annual rates are shown only when at least ten projects have valid ratings.
+`fetch.py` downloads API pages of 1,000, verifies the source columns, and atomically saves a snapshot. `analysis.py` validates ratings, removes duplicates, drops missing/unrecognized ratings and invalid years, then excludes closing years newer than three years before the source snapshot's calendar year to reduce the evaluation lag. Using the snapshot avoids treating future-dated source rows as the maturity anchor. Annual rates are shown only when at least ten projects have valid ratings.
 
 For a selected region or global practice with at least eight eligible annual cohorts, two models compete: the mean of the last three eligible annual rates and a five-cohort linear trend (clipped to [0, 1]). Expanding-window, one-year-ahead backtests use only consecutive fiscal years, require at least three comparisons, and select the model with lower mean absolute error (MAE). The selected model forecasts the next three closing-year cohorts. The shaded ±MAE band is an **illustrative scenario**, not a confidence or prediction interval. The method treats cohort rates equally, while the charts also show denominators for interpretation.
 
